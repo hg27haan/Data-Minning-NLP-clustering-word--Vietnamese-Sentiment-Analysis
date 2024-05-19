@@ -19,7 +19,7 @@
    
 2. **Vietnamese Sentiment Analysis using RNN/LSTM**
    - **Responsible Person:** Đặng Nguyễn Quang Huy
-   - **Model:** Artificial Neural Network (RNN/LSTM,Data Preprocessing,EDA)
+   - **Model:** Artificial Neural Network (RNN/LSTM,Data Preprocessing,EDA(power BI))
    
 3. **Clustering Words Based on Context using ANN**
    - **Responsible Person:** Đái Triệu Phi
