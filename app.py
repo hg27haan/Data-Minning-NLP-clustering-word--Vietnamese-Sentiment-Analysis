@@ -1,7 +1,7 @@
-# Thêm import cho st.script_request_queue
 import streamlit as st
 from function.datapreprocessing import DataPreprocessing
 from function.User_file import User
+import streamlit.components.v1 as components
 from function.UserDao_file import UserDao
 from keras.models import load_model
 import numpy as np
@@ -19,12 +19,14 @@ def predict_sentiment(comment):
 # Function to generate text
 def generate_text(comment):
     model_generate = load_model("./model/model_lstm_generate_text.h5")
+    temp=""
     for _ in range(3):
         comment_processed = dp.fit_transform_generate(comment)
         predicted_probs = model_generate.predict(comment_processed)
         word = dp.generate.index_word[np.argmax(predicted_probs)]
         comment += " " + word
-    return comment
+        temp += " " +word
+    return temp
 
 # Streamlit app for sentiment analysis
 def sentiment_analysis(username):
@@ -45,17 +47,28 @@ def sentiment_analysis(username):
                 st.write("Sentiment:", prediction)
     else:
         comment_state = st.empty()
-        comment = st.text_area("Enter your comment:", key='comment_area')
+        comment_input = st.text_area("Enter your comment:", key='comment_area')
         st.write(f"Hello, {username}")
+        space_key_js = """
+        <script>
+        document.addEventListener("keydown", function(event) {
+            var commentInput = document.querySelector('textarea[key="comment_area"]');
+            if (event.code === "Space") {
+                return true;
+                }
+            }
+        });
+        </script>
+        """
+        space_key_event = components.html(space_key_js, height=0)
         if st.button("Enter comment"):
-            userDao.insert_comment(user_id, comment)
-            st.success("Comment posted successfully!")
+            userDao.insert_comment(user_id, comment_input)
+            st.success("Comment posted successfully!")  
+        if space_key_event :
+            updated_comment = generate_text(comment_input)
+            comment_state.text(comment_input + updated_comment)
 
-        if st.button("Generate Text"):
-            updated_comment = generate_text(comment)
-            comment_state.text(updated_comment)
-
-
+                
 # Streamlit app for login page
 def login_page():
     st.title("Login Page")
