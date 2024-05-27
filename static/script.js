@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-complete for comment input
     const commentInput = document.querySelector('textarea[name="comment_input"]');
     
     if (commentInput) {
@@ -48,25 +49,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const itemsPerPage = 5;
 
         function showItems() {
-            const offset = -currentIndex * 100 / itemsPerPage;
-            phoneList.style.transform = `translateX(${offset}%)`;
+            items.forEach((item, index) => {
+                item.style.display = (index >= currentIndex && index < currentIndex + itemsPerPage) ? 'block' : 'none';
+            });
         }
 
         prevBtn.addEventListener('click', function() {
-            if (currentIndex > 0) {
-                currentIndex -= itemsPerPage;
-            } else {
-                currentIndex = Math.max(0, items.length - itemsPerPage);
-            }
+            currentIndex = (currentIndex - itemsPerPage + items.length) % items.length;
             showItems();
         });
 
         nextBtn.addEventListener('click', function() {
-            if (currentIndex < items.length - itemsPerPage) {
-                currentIndex += itemsPerPage;
-            } else {
-                currentIndex = 0;
-            }
+            currentIndex = (currentIndex + itemsPerPage) % items.length;
             showItems();
         });
 

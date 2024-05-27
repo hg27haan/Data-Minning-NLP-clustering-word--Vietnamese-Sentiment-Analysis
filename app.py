@@ -63,16 +63,26 @@ def sentiment_analysis():
 @app.route('/phone', methods=['GET', 'POST'])
 def phone():
     phoneDao = PhoneDao()
-    phone_of_db = phoneDao.get_phone_name()
-    # print(phone_of_db)  # Debug print để kiểm tra dữ liệu lấy từ DB
+    phone_of_db = phoneDao.get_phone()
 
     results = []
     for phone in phone_of_db[:30]:  # Chỉ lấy 30 điện thoại đầu tiên
         if phone[0] is not None:
-            phone_result = Phone(id=None, phone_name=phone[0])
+            phone_result = Phone(id=phone[0], phone_name=phone[1], specifications=phone[2], photo=phone[3])
             results.append(phone_result)
 
     return render_template('phone.html', results=results)
+
+@app.route('/phone/<int:phone_id>')
+def phone_detail(phone_id):
+    phoneDao = PhoneDao()
+    phone_of_db = phoneDao.get_phone_by_id(phone_id)
+    if phone_of_db:
+        phone = Phone(id=phone_of_db[0], phone_name=phone_of_db[1], specifications=phone_of_db[2], photo=phone_of_db[3])
+        return render_template('sentiment_analysis.html', phone=phone)
+    else:
+        return "Phone not found", 404
+
 
 
 @app.route('/', methods=['GET', 'POST'])

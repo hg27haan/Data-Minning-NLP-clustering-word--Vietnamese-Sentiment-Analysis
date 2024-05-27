@@ -11,18 +11,24 @@
     </div>
     <div class="container">
         {% if results %}
-            <div class="phone-list-wrapper">
-                <div class="phone-list">
-                    {% for phone in results %}
-                        <div class="phone-item">
-                            <h2>{{ phone.get_phone_name }}</h2>
-                        </div>
-                    {% endfor %}
-                </div>
+            <div class="phone-list">
+                {% for phone in results %}
+                    <div class="phone-item">
+                        <a href="{{ url_for('phone_detail', phone_id=phone.getId) }}">
+                            <h2>{{ phone.getPhoneName }}</h2>
+                            <img src="{{ phone.getPhoto }}" alt="{{ phone.getPhoneName }}" />
+                        </a>
+                        <ul>
+                            {% for key, value in phone.getSpecifications.items() %}
+                                <li><strong>{{ key }}:</strong> {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
             </div>
-            <div class="navigation">
-                <button id="prevBtn" class="nav-btn">Prev</button>
-                <button id="nextBtn" class="nav-btn">Next</button>
+            <div class="pagination-buttons">
+                <button id="prevBtn">Previous</button>
+                <button id="nextBtn">Next</button>
             </div>
         {% else %}
             <p>No phones found.</p>
