@@ -19,6 +19,7 @@ GO
 CREATE TABLE phone (
     id INT IDENTITY PRIMARY KEY,
     phone_name NVARCHAR(MAX)
+	specifications NVARCHAR(MAX)
 );
 GO
 
@@ -49,7 +50,7 @@ GO
 INSERT INTO phone (phone_name) VALUES
 (N'iPhone 12'),
 (N'iPhone 12 Pro'),
-(N'iPhone 12 Pro Max'),
+(N'iPhone 12 Pro Max'), 
 (N'iPhone 13'),
 (N'iPhone 13 Pro'),
 (N'iPhone 13 Pro Max'),

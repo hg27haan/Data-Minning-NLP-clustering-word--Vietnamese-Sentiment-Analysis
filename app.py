@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from function.datapreprocessing import DataPreprocessing
 from function.User_file import User
+from function.Phone_file import Phone
 from function.UserDao_file import UserDao
+from function.PhoneDao_file import PhoneDao
 from keras.models import load_model
 import numpy as np
 
@@ -58,6 +60,21 @@ def sentiment_analysis():
             return render_template('sentiment_analysis.html', user_id=user.getUserId, username=user.getUserName)
     return render_template('sentiment_analysis.html', user_id=user.getUserId, username=user.getUserName)
 
+@app.route('/phone', methods=['GET', 'POST'])
+def phone():
+    phoneDao = PhoneDao()
+    phone_of_db = phoneDao.get_phone_name()
+    # print(phone_of_db)  # Debug print để kiểm tra dữ liệu lấy từ DB
+
+    results = []
+    for phone in phone_of_db[:30]:  # Chỉ lấy 30 điện thoại đầu tiên
+        if phone[0] is not None:
+            phone_result = Phone(id=None, phone_name=phone[0])
+            results.append(phone_result)
+
+    return render_template('phone.html', results=results)
+
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -70,7 +87,7 @@ def login():
             user_id = userDao.get_user_id(user)
             session['username'] = username
             session['user_id'] = user_id
-            return redirect(url_for('sentiment_analysis'))
+            return redirect(url_for('phone'))
         else:
             flash('Invalid username or password.', 'error')
 

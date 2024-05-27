@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phone List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Phone List</h1>
+    </div>
+    <div class="container">
+        {% if results %}
+            <div class="phone-list-wrapper">
+                <div class="phone-list">
+                    {% for phone in results %}
+                        <div class="phone-item">
+                            <h2>{{ phone.get_phone_name }}</h2>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="navigation">
+                <button id="prevBtn" class="nav-btn">Prev</button>
+                <button id="nextBtn" class="nav-btn">Next</button>
+            </div>
+        {% else %}
+            <p>No phones found.</p>
+        {% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
