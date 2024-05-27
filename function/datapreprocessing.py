@@ -20,10 +20,21 @@ class DataPreprocessing:
         comment=self.generate.texts_to_sequences([comment])
         comment=pad_sequences(comment,maxlen=151,padding='pre')
         return comment
+    def normalize_numbers(self,comment):
+        return re.sub(r'\d+', 'number', comment)
+    def remove_repeated_words(self,comment):
+        words = comment.split()
+        new_words = []
+        for i in range(len(words)):
+            if i == 0 or words[i] != words[i-1]:
+                new_words.append(words[i])
+        return ' '.join(new_words)
     def fit_transform(self,comment):
         comment=self.remove_punctuation(comment.lower())
+        comment=self.normalize_numbers(comment)
         comment=self.remove_stopword(comment)
-        comment=[ViTokenizer.tokenize(comment)]
+        comment=ViTokenizer.tokenize(comment)
+        comment=[self.remove_repeated_words(comment)]
         comment=self.WordSeparation(comment)
         comment=self.Padding(comment,131)
         return comment
@@ -45,11 +56,11 @@ class DataPreprocessing:
         return tokenizer
     def Standardization(self,comment):
         if comment =='Positive':
-            return "Đây là một câu nói mang ý nghĩa tích cực cho thấy bạn rất thích"
+            return "Đây là một bình luận mang ý nghĩa tích cực "
         elif comment =='Negative':
-            return "Đây là một câu nói mang ý nghĩa tiêu cực cho thấy bạn đang rất buồn"
+            return "Đây là một bình luận mang ý nghĩa tiêu cực "
         else:
-            return "Đây là một bình luận chứa ý kiến không rõ ràng"
+            return "Đây là một bình luận mang ý nghĩa trung lập"
     def remove_punctuation(self,comment):
         # Create a translation table
         translator = str.maketrans('', '', string.punctuation)
