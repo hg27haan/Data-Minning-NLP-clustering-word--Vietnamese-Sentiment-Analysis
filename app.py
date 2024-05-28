@@ -2,6 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from function.datapreprocessing import DataPreprocessing
 from function.User_file import User
 from function.UserDao_file import UserDao
+from function.Comment_file import Comment
+from function.CommentDao_File import CommentDao
+from function.PhoneDao_file import PhoneDao
+from function.Phone_file import Phone
 from keras.models import load_model
 import numpy as np
 
@@ -28,17 +32,19 @@ def predict_sentiment(comment):
     result = model_sentiment.predict(comment)
     label_index = np.argmax(result, axis=1)
     predicted_label = dp.labelEn.inverse_transform(label_index)
-    return predicted_label[0]  # Assuming single comment prediction
+    return predicted_label[0]  
 
 @app.route('/sentiment_analysis', methods=['GET', 'POST'])
 def sentiment_analysis():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     userDao = UserDao()
+    commentDao= CommentDao()
+    phoneDao=PhoneDao()
     user = User(userid=session['user_id'], username=session['username'])
     if user.getUserId == 1:
         if request.method == 'POST' and 'predict' in request.form:
-            comment_of_user = userDao.get_comment_by_user()
+            comment_of_user = commentDao.get_comment_by_user()
             results = []
             for comment in comment_of_user:
                 if comment[0] is not None:
@@ -46,14 +52,19 @@ def sentiment_analysis():
                     full_name = userDao.get_full_name(User(comment=comment[0]))
                     prediction = predict_sentiment(processed_comment)
                     prediction = dp.Standardization(prediction)
-                    user_result = User(username=full_name, comment=comment[0], predict=prediction)
+                    user_result = User(userid=user.getUserId,username=full_name, comment=comment[0], predict=prediction)
+                    comment=Comment(comment[0],prediction)
+                    commentDao.update_comment(comment,user_result)
                     results.append(user_result)
             return render_template('sentiment_analysis.html', user_id=user.getUserId, results=results)
     else:
         if request.method == 'POST':
             comment_input = request.form.get('comment_input')
             user = User(userid=session['user_id'], username=session['username'], comment=comment_input)
-            userDao.insert_comment(user)
+            comment=Comment(comment_input)
+            commentDao.insert_comment(user,comment)
+            phone=Phone(phone_name)
+            phoneDao.insert_comment_phone (user,comment)
             flash('Comment posted successfully!', 'success')
             return render_template('sentiment_analysis.html', user_id=user.getUserId, username=user.getUserName)
     return render_template('sentiment_analysis.html', user_id=user.getUserId, username=user.getUserName)

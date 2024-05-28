@@ -24,21 +24,7 @@ class UserDao:
         user_row = cursor.fetchone()
         conn.close()
         return user_row[0] if user_row else None
-    def get_comment_by_user(self):
-        conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=MSI;DATABASE=SalesPhone;Trusted_Connection=yes')
-        cursor = conn.cursor()
-        cursor.execute("SELECT comment FROM comment")
-        comments = cursor.fetchall()
-        return comments
-    def insert_comment(self,user:User):
-        if user.getUserId !=None:
-            conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=MSI;DATABASE=SalesPhone;Trusted_Connection=yes')
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO comment (user_id, comment) VALUES (?, ?)",(user.getUserId,user.getComment))
-            conn.commit() 
-            conn.close()
-        else:
-            print("User not found.")
+
 
 
 
