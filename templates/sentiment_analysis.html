@@ -19,14 +19,14 @@
                 {% for user in results %}
                     <p>Hello {{ user.getUserName }},! This is the result of analyzing the results of the comment:</p>
                     <p>'{{ user.getComment }}'</p>
-                    <p>Sentiment: {{ user.getPredict}}</p>
+                    <p>Sentiment: {{ user.getPredict }}</p>
                 {% endfor %}
             {% endif %}
         {% else %}
             <p>Hello, {{ username }}!</p>
-            <form method="POST">
+            <form method="POST" action="{{ url_for('sentiment_analysis')}} ">
                 <textarea name="comment_input" placeholder="Enter your comment:" required></textarea><br><br>
-                <button type="submit">Enter comment</button>
+                <button type="submit" name="submit">Enter comment</button>
             </form>
         {% endif %}
     {% endif %}

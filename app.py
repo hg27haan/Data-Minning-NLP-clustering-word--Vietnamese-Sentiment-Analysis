@@ -6,9 +6,9 @@ from function.UserDao_file import UserDao
 from function.Comment_file import Comment
 from function.CommentDao_File import CommentDao
 from function.PhoneDao_file import PhoneDao
-from function.Phone_file import Phone
 from keras.models import load_model
 import numpy as np
+import csv
 
 app = Flask(__name__)
 app.secret_key = 'sentiment'
@@ -33,38 +33,59 @@ def predict_sentiment(comment):
     result = model_sentiment.predict(comment)
     label_index = np.argmax(result, axis=1)
     predicted_label = dp.labelEn.inverse_transform(label_index)
-    return predicted_label[0]  
+    return predicted_label[0]
 
 @app.route('/sentiment_analysis', methods=['GET', 'POST'])
 def sentiment_analysis():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     userDao = UserDao()
-    commentDao= CommentDao()
-    phoneDao=PhoneDao()
+    commentDao = CommentDao()
+    phoneDao = PhoneDao()
     user = User(userid=session['user_id'], username=session['username'])
     if user.getUserId == 1:
         if request.method == 'POST' and 'predict' in request.form:
             comment_of_user = commentDao.get_comment_by_user()
             results = []
-            for comment in comment_of_user:
-                if comment[0] is not None:
-                    processed_comment = dp.fit_transform(comment[0])
-                    full_name = userDao.get_full_name(User(comment=comment[0]))
+            for comment_user in comment_of_user:
+                comment = Comment(comment_id=comment_user[0], comment=comment_user[1])
+                if comment is not None:
+                    processed_comment = dp.fit_transform(comment.getComment)
+                    full_name = userDao.get_full_name(User(comment=comment.getComment))
                     prediction = predict_sentiment(processed_comment)
-                    prediction = dp.Standardization(prediction)
-                    user_result = User(userid=user.getUserId,username=full_name, comment=comment[0], predict=prediction)
-                    comment=Comment(comment[0],prediction)
-                    commentDao.update_comment(comment,user_result)
+                    prediction_s = dp.Standardization(prediction)
+                    user_result = User(userid=user.getUserId, username=full_name, comment=comment.getComment, predict=prediction_s)
+                    comment_result = Comment(comment_id=comment.getId, predict=prediction)
+                    commentDao.update_comment(comment_result)
                     results.append(user_result)
+
+            # Call the statistical function
+            statistics = commentDao.statistical()
+
+            # Export statistics to CSV
+            with open('statistics.csv', 'w', newline='', encoding='utf-8') as csvfile:
+                fieldnames = ['Phone Name', 'Number of Positives', 'Number of Negatives', 'Number of Neutrals']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                for row in statistics:
+                    writer.writerow({
+                        'Phone Name': row[0],
+                        'Number of Positives': row[1],
+                        'Number of Negatives': row[2],
+                        'Number of Neutrals': row[3]
+                    })
+
             return render_template('sentiment_analysis.html', user_id=user.getUserId, results=results)
     else:
         if request.method == 'POST':
             comment_input = request.form.get('comment_input')
             user = User(userid=session['user_id'], username=session['username'], comment=comment_input)
-            comment=Comment(comment_input)
-            commentDao.insert_comment(user,comment)
-            phoneDao.insert_comment_phone (user,comment)
+            phone = Phone(id=session['phone_id'])
+            comment = Comment(comment=comment_input)
+            commentDao.insert_comment(user, comment)
+            comment_id = commentDao.get_comment_id_by_user()
+            comment_idp = Comment(comment_id=comment_id)
+            phoneDao.insert_comment_phone(phone, comment_idp)
             flash('Comment posted successfully!', 'success')
             return render_template('sentiment_analysis.html', user_id=user.getUserId, username=user.getUserName)
     return render_template('sentiment_analysis.html', user_id=user.getUserId, username=user.getUserName)
@@ -72,23 +93,21 @@ def sentiment_analysis():
 @app.route('/phone', methods=['GET', 'POST'])
 def phone():
     phoneDao = PhoneDao()
-    phone_of_db = phoneDao.get_phone()
+    phone_of_db = phoneDao.get_list_phone()
     results = []
-    for phone in phone_of_db[:30]: 
+    for phone in phone_of_db[:30]:
         if phone[0] is not None:
             phone_result = Phone(id=phone[0], phone_name=phone[1], specifications=phone[2], photo=phone[3])
             results.append(phone_result)
     return render_template('phone.html', results=results)
 
-@app.route('/phone/<int:phone_id>')
+@app.route('/phone/<int:phone_id>', methods=['GET', 'POST'])
 def phone_detail(phone_id):
     phoneDao = PhoneDao()
     phone_of_db = phoneDao.get_phone(phone_id)
-    if phone_of_db:
-        phone = Phone(id=phone_of_db[0], phone_name=phone_of_db[1], specifications=phone_of_db[2], photo=phone_of_db[3])
-        return render_template('sentiment_analysis.html', phone=phone)
-    else:
-        return "Phone not found", 404
+    session['phone_id'] = phone_id
+    user = User(username=session['username'], userid=session['user_id'])
+    return render_template('sentiment_analysis.html', user_id=user.getUserId, user_name=user.getUserName)
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -102,7 +121,10 @@ def login():
             user_id = userDao.get_user_id(user)
             session['username'] = username
             session['user_id'] = user_id
-            return redirect(url_for('phone'))
+            if session['user_id'] == 1:
+                return redirect(url_for('sentiment_analysis'))
+            else:
+                return redirect(url_for('phone'))
         else:
             flash('Invalid username or password.', 'error')
 

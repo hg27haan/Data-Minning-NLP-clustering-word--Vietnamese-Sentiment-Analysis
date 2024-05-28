@@ -9,7 +9,7 @@ GO
 -- Tạo bảng users
 CREATE TABLE users (
     id INT IDENTITY PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
+    username VARCHAR(255) unique,
     full_name NVARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL
 );

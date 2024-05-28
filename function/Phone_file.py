@@ -7,15 +7,16 @@ class Phone:
 
 
     def parse_specifications(self, specifications):
-        specs_list = specifications.strip('[]').split(', ')
-        specs_dict = {
-            'CAMERA': specs_list[0],
-            'RAM': specs_list[1],
-            'Bộ nhớ': specs_list[2],
-            'Pin': specs_list[3],
-            'Hãng': specs_list[4]
-        }
-        return specs_dict
+        if specifications !=None:
+            specs_list = specifications.strip('[]').split(', ') 
+            specs_dict = {
+                'CAMERA': specs_list[0],
+                'RAM': specs_list[1],
+                'Bộ nhớ': specs_list[2],
+                'Pin': specs_list[3],
+                'Hãng': specs_list[4]
+            }
+            return specs_dict
 
     @property
     def getId(self):

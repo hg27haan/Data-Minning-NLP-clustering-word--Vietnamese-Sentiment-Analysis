@@ -35,6 +35,7 @@ class DataPreprocessing:
         comment=self.remove_stopword(comment)
         comment=ViTokenizer.tokenize(comment)
         comment=[self.remove_repeated_words(comment)]
+        print(comment)
         comment=self.WordSeparation(comment)
         comment=self.Padding(comment,131)
         return comment
