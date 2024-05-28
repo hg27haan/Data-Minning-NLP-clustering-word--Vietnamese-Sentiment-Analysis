@@ -6,27 +6,50 @@ import pandas as pd
 import string
 import re
 class DataPreprocessing:
-    def __init__(self,path):
+    def __init__(self,path,path_generate):
         self.x_train,self.y_train=self.ReadData(path) if not None else None
         self.x_train=self.WordSeparation(self.x_train)
         self.x_train=self.CreateCorpus(self.x_train)
         self.labelEn=LabelEncoder()
         self.labelEn.fit_transform(self.y_train)
+        self.generate=self.ReadData_ge(path_generate)
+        self.generate=self.WordSeparation(self.generate)
+        self.generate=self.CreateCorpus(self.generate)
+    def fit_transform_generate(self,comment):
+        comment=ViTokenizer.tokenize(comment)
+        comment=self.generate.texts_to_sequences([comment])
+        comment=pad_sequences(comment,maxlen=151,padding='pre')
+        return comment
+    def normalize_numbers(self,comment):
+        return re.sub(r'\d+', 'number', comment)
+    def remove_repeated_words(self,comment):
+        words = comment.split()
+        new_words = []
+        for i in range(len(words)):
+            if i == 0 or words[i] != words[i-1]:
+                new_words.append(words[i])
+        return ' '.join(new_words)
     def fit_transform(self,comment):
         comment=self.remove_punctuation(comment.lower())
+        comment=self.normalize_numbers(comment)
         comment=self.remove_stopword(comment)
-        comment=[ViTokenizer.tokenize(comment)]
+        comment=ViTokenizer.tokenize(comment)
+        comment=[self.remove_repeated_words(comment)]
+        print(comment)
         comment=self.WordSeparation(comment)
-        comment=self.Padding(comment)
+        comment=self.Padding(comment,131)
         return comment
+    def ReadData_ge(self,path):
+        df=pd.read_csv(path,encoding='utf-8')
+        return df['comment']
     def ReadData(self,path):
         df=pd.read_csv(path,encoding='utf-8')
         return df['comment'], df['label']
     def WordSeparation(self,comment):
         return [review.split() for review in comment]
-    def Padding(self,comment):
+    def Padding(self,comment,sequence):
         comment=self.x_train.texts_to_sequences(comment)
-        comment=pad_sequences(comment,maxlen=131,padding='pre')
+        comment=pad_sequences(comment,maxlen=sequence,padding='pre')
         return comment
     def CreateCorpus(self,Vi):
         tokenizer=Tokenizer(oov_token='<oov>')
@@ -34,11 +57,11 @@ class DataPreprocessing:
         return tokenizer
     def Standardization(self,comment):
         if comment =='Positive':
-            return "Đây là một câu nói mang ý nghĩa tích cực cho thấy bạn rất thích"
+            return "Đây là một bình luận mang ý nghĩa tích cực "
         elif comment =='Negative':
-            return "Đây là một câu nói mang ý nghĩa tiêu cực cho thấy bạn đang rất buồn"
+            return "Đây là một bình luận mang ý nghĩa tiêu cực "
         else:
-            return "Đây là một bình luận chứa ý kiến không rõ ràng"
+            return "Đây là một bình luận mang ý nghĩa trung lập"
     def remove_punctuation(self,comment):
         # Create a translation table
         translator = str.maketrans('', '', string.punctuation)
@@ -70,7 +93,7 @@ class DataPreprocessing:
 
         return new_string
     def read_filestopwords(self):
-        with open('./data/vietnamese-stopwords.txt', 'r', encoding='utf-8') as file:
+        with open('./data/data_stopword/vietnamese-stopwords.txt', 'r', encoding='utf-8') as file:
             lines = file.readlines()
             words = [line.split('\n')[0] for line in lines]
         return words
