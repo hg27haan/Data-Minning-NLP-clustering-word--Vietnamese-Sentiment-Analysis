@@ -105,9 +105,10 @@ def phone():
 def phone_detail(phone_id):
     phoneDao = PhoneDao()
     phone_of_db = phoneDao.get_phone(phone_id)
+    phone = Phone(id=phone_of_db[0], phone_name=phone_of_db[1], specifications=phone_of_db[2], photo=phone_of_db[3])
     session['phone_id'] = phone_id
     user = User(username=session['username'], userid=session['user_id'])
-    return render_template('sentiment_analysis.html', user_id=user.getUserId, user_name=user.getUserName)
+    return render_template('sentiment_analysis.html', user_id=user.getUserId, user_name=user.getUserName, phone=phone)
 
 @app.route('/', methods=['GET', 'POST'])
 def login():

@@ -1,7 +1,7 @@
 import pyodbc
 from function.User_file import User
 class UserDao:
-   
+    
     def check_login(self,user:User):
         conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=MSI;DATABASE=SalesPhone;Trusted_Connection=yes')
         cursor = conn.cursor()
