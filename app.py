@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from function.datapreprocessing import DataPreprocessing
 from function.User_file import User
+from function.Phone_file import Phone
 from function.UserDao_file import UserDao
 from function.Comment_file import Comment
 from function.CommentDao_File import CommentDao
@@ -63,11 +64,31 @@ def sentiment_analysis():
             user = User(userid=session['user_id'], username=session['username'], comment=comment_input)
             comment=Comment(comment_input)
             commentDao.insert_comment(user,comment)
-            phone=Phone(phone_name)
             phoneDao.insert_comment_phone (user,comment)
             flash('Comment posted successfully!', 'success')
             return render_template('sentiment_analysis.html', user_id=user.getUserId, username=user.getUserName)
     return render_template('sentiment_analysis.html', user_id=user.getUserId, username=user.getUserName)
+
+@app.route('/phone', methods=['GET', 'POST'])
+def phone():
+    phoneDao = PhoneDao()
+    phone_of_db = phoneDao.get_phone()
+    results = []
+    for phone in phone_of_db[:30]: 
+        if phone[0] is not None:
+            phone_result = Phone(id=phone[0], phone_name=phone[1], specifications=phone[2], photo=phone[3])
+            results.append(phone_result)
+    return render_template('phone.html', results=results)
+
+@app.route('/phone/<int:phone_id>')
+def phone_detail(phone_id):
+    phoneDao = PhoneDao()
+    phone_of_db = phoneDao.get_phone(phone_id)
+    if phone_of_db:
+        phone = Phone(id=phone_of_db[0], phone_name=phone_of_db[1], specifications=phone_of_db[2], photo=phone_of_db[3])
+        return render_template('sentiment_analysis.html', phone=phone)
+    else:
+        return "Phone not found", 404
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -81,7 +102,7 @@ def login():
             user_id = userDao.get_user_id(user)
             session['username'] = username
             session['user_id'] = user_id
-            return redirect(url_for('sentiment_analysis'))
+            return redirect(url_for('phone'))
         else:
             flash('Invalid username or password.', 'error')
 
