@@ -2,6 +2,24 @@
 
 ![workflow](https://github.com/ZeusCoderBE/NLP-clustering-word--Vietnamese-Sentiment-Analysis/assets/117000361/07f725cc-ff77-4909-a9bd-62265e478cb9)
 
+### Tasks:
+
+1. **Vietnamese Sentiment Analysis using CNN**
+   - **Responsible Person:** Huỳnh Gia Hân
+   - **Model:** Artificial Neural Network (CNN+LSTM,Data visualization(python))
+   
+2. **Vietnamese Sentiment Analysis using RNN/LSTM**
+   - **Responsible Person:** Đặng Nguyễn Quang Huy
+   - **Model:** Artificial Neural Network (RNN/LSTM,Data Preprocessing,EDA(power BI))
+   
+3. **Clustering Words Based on Context using ANN**
+   - **Responsible Person:** Đái Triệu Phi
+   - **Model:** Artificial Neural Network (ANN)
+   
+4. **Regression Model**
+   - **Responsible Person:** Nguyễn Trọng Dũng
+   - **Tasks:** Exploratory Data Analysis, Data Visualization, Data Preprocessing, Model Building
+
 ### I.Data Information:
 
 - **Train Data:** 7,786 samples
