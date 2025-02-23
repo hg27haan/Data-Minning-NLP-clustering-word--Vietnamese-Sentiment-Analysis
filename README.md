@@ -23,9 +23,6 @@
 
 <img width="750" alt="image" src="https://github.com/user-attachments/assets/05fad310-6f22-4692-ab33-047dfb1157a9">
 
-
-
-
 ###### Based on the chart above, in the years from early 2017 to early 2019, customer reviews for products were quite high, averaging about 4.5. But between mid-2019 and the end of 2020, average reviews dropped alarmingly, demonstrating that customers are very dissatisfied with the quality of our products or services. It is necessary to urgently re-check product or service quality management steps to improve the situation
 
 ##### 2.The chart shows the number of labels evaluated over time
@@ -57,5 +54,3 @@
 
 ### 5.3.Ploting learning curves Hybrid CNN with LSTM for sentiment analysis:
 ![image](https://github.com/ZeusCoderBE/NLP-clustering-word--Vietnamese-Sentiment-Analysis/assets/117000361/cffe57cd-0338-4207-bb12-a213c706f330)
-
-
